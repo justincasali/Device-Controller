@@ -7,12 +7,48 @@ import android.telephony.PhoneStateListener;
 import android.widget.TextView;
 import android.telephony.TelephonyManager;
 import android.app.Service;
+import android.net.Uri;
+import android.database.Cursor;
+import android.os.Build;
 
 
 
 public class MainActivity extends AppCompatActivity {
     TextView text;
     TextView text2;
+    String contact;
+
+    public String getContactName(final String phoneNumber)
+    {
+        Uri uri;
+        String[] projection;
+
+        if (Build.VERSION.SDK_INT >= 5)
+        {
+            uri = Uri.parse("content://com.android.contacts/phone_lookup");
+            projection = new String[] { "display_name" };
+        }
+        else
+        {
+            uri = Uri.parse("content://contacts/phones/filter");
+            projection = new String[] { "name" };
+        }
+
+        uri = Uri.withAppendedPath(uri, Uri.encode(phoneNumber));
+        Cursor cursor = this.getContentResolver().query(uri, projection, null, null, null);
+
+        String contactName = "";
+
+        if (cursor.moveToFirst())
+        {
+            contactName = cursor.getString(0);
+        }
+
+        cursor.close();
+        cursor = null;
+
+        return contactName;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCallStateChanged(int state, String incomingNumber){
             if (state == TelephonyManager.CALL_STATE_RINGING){
-                text2.setText(incomingNumber);
+                contact = getContactName(incomingNumber);
+                text2.setText(contact);
             }
         }
     };
