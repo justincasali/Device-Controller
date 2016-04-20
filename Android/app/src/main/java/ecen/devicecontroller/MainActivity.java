@@ -18,12 +18,8 @@ public class MainActivity extends AppCompatActivity {
     public BroadcastReceiver broadcast_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //String message = Telephony.Sms.Intents.getMessagesFromIntent(intent)[0].getMessageBody();
-            //text.setText(message);
-            if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
-                String m = "Text Message";
-                text.setText(m);
-            }
+            String message = Telephony.Sms.Intents.getMessagesFromIntent(intent)[0].getMessageBody();
+            text.setText(message);
         }
     };
 
@@ -37,14 +33,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         this.registerReceiver(broadcast_receiver, intent_filter);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         this.unregisterReceiver(broadcast_receiver);
     }
 
