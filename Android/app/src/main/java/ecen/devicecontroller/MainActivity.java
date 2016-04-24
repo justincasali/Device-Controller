@@ -12,17 +12,19 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 // Source: http://codetheory.in/android-sms/
 
 public class MainActivity extends AppCompatActivity {
 
-    private String phoneNumber;
+    private String phoneNumber = null;
     private SmsManager smsManager;
 
     private TextView textMessage;
     private TextView textAddress;
+    private EditText textCustom;
 
     private IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
     private String TAG = MainActivity.class.getSimpleName();
@@ -69,18 +71,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textMessage = (TextView) findViewById(R.id.textMessage);
         textAddress = (TextView) findViewById(R.id.textAddress);
-        this.registerReceiver(receiver, filter);
+        textCustom = (EditText) findViewById(R.id.editTextCustom);
 
+        this.registerReceiver(receiver, filter);
         smsManager = SmsManager.getDefault();
-        phoneNumber = null;
     }
 
-    public void onClick(View view) {
+    public void replyYes(View view) {
+        if (phoneNumber != null) smsManager.sendTextMessage(phoneNumber, null, "Yes", null, null);
+    }
 
-        if (view.getId() == R.id.buttonReply) {
-            if (phoneNumber != null) smsManager.sendTextMessage(phoneNumber, null, "I'm in the shower, fuck off!", null, null);
-        }
+    public void replyNo(View view) {
+        if (phoneNumber != null) smsManager.sendTextMessage(phoneNumber, null, "No", null, null);
+    }
 
+    public void replyCustom(View view) {
+        if (phoneNumber != null) smsManager.sendTextMessage(phoneNumber, null, textCustom.getText().toString(), null, null);
     }
 
 }

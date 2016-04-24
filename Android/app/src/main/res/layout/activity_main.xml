@@ -32,10 +32,40 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reply"
-        android:id="@+id/buttonReply"
+        android:text="Reply Yes"
+        android:id="@+id/buttonReplyYes"
+        android:onClick="replyYes"
+        android:layout_above="@+id/buttonReplyNo"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply No"
+        android:id="@+id/buttonReplyNo"
+        android:layout_above="@+id/buttonReplyCustom"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="replyNo" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply Custom"
+        android:id="@+id/buttonReplyCustom"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:onClick="onClick" />
+        android:onClick="replyCustom" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextCustom"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="Can&apos;t talk, in the shower"
+        android:layout_above="@+id/buttonReplyYes" />
+
 </RelativeLayout>
