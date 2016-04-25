@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.CountDownTimer;
 import android.provider.Telephony;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,9 @@ import app.akexorcist.bluetotohspp.library.*;
 // Source: http://codetheory.in/android-sms/
 
 public class MainActivity extends AppCompatActivity {
+
+    int lastIndex;
+    SmsMessage[] msgs = null;
 
     private BluetoothSPP bluetooth;
 
@@ -39,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             // Get the data (SMS data) bound to intent
             Bundle bundle = intent.getExtras();
 
-            SmsMessage[] msgs = null;
+            //SmsMessage[] msgs = null;
 
             if (bundle != null) {
                 // Retrieve the SMS Messages received
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // Index of last message
-                int lastIndex = msgs.length - 1;
+                lastIndex = msgs.length - 1;
 
                 // First message in array
                 textMessage.setText(msgs[lastIndex].getMessageBody());
@@ -63,8 +67,23 @@ public class MainActivity extends AppCompatActivity {
                 if (isConnected) {
                     byte[] data = {0x74};
                     bluetooth.send(data, false);
-                    bluetooth.send(msgs[lastIndex].getOriginatingAddress(), false);
-                    bluetooth.send(msgs[lastIndex].getMessageBody(), false);
+                    new CountDownTimer(500, 500) {
+                        public void onFinish() {
+                            bluetooth.send(msgs[lastIndex].getOriginatingAddress(), false);
+                            new CountDownTimer(500, 500) {
+                                public void onFinish() {
+                                    bluetooth.send(msgs[lastIndex].getMessageBody(), false);
+                                }
+                                public void onTick(long mills) {
+
+                                }
+
+                            }.start();
+                        }
+                        public void onTick(long mills) {
+
+                        }
+                    }.start();
                 }
 
             }
