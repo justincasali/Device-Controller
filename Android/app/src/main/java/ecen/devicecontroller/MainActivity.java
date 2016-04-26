@@ -21,10 +21,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import java.util.Calendar;
+import java.util.zip.CheckedOutputStream;
 
 import app.akexorcist.bluetotohspp.library.*;
 
 // Source: http://codetheory.in/android-sms/
+
+// 0x11 = time, 0x12 = text, 0x13 = call
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 phoneNumber = msgs[lastIndex].getOriginatingAddress();
 
                 if (isConnected) {
-                    byte[] data = {0x74};
+                    byte[] data = {0x12};
                     bluetooth.send(data, false);
                     new CountDownTimer(500, 500) {
                         @Override
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 textAddress.setText(getContactName(incomingNumber));
                 textMessage.setText("Incoming Call");
                 if (isConnected) {
-                    byte[] data = {0x63};
+                    byte[] data = {0x13};
                     bluetooth.send(data, false);
                     new CountDownTimer(500, 500) {
                         @Override
@@ -151,9 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Bluetooth
         bluetooth = new BluetoothSPP(getApplicationContext());
-
-        // Calender
-        calendar = Calendar.getInstance();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -176,6 +176,37 @@ public class MainActivity extends AppCompatActivity {
             public void onDeviceConnected(String name, String address) {
                 textStatus.setText("Connected");
                 isConnected = true;
+
+                // Set up Calendar
+                calendar = Calendar.getInstance();
+
+                // Send byte array {0x11, Hour, Minute}
+                byte[] data = {0x11};
+                bluetooth.send(data, false);
+                new CountDownTimer(500, 500) {
+                    @Override
+                    public void onFinish() {
+                        byte[] data = {(byte) calendar.get(Calendar.HOUR_OF_DAY)};
+                        bluetooth.send(data, false);
+                        new CountDownTimer(500, 500) {
+                            @Override
+                            public void onFinish() {
+                                byte[] data = {(byte) calendar.get(Calendar.MINUTE)};
+                                bluetooth.send(data, false);
+                            }
+
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+
+                            }
+                        }.start();
+                    }
+
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+                }.start();
             }
 
             @Override
@@ -195,21 +226,14 @@ public class MainActivity extends AppCompatActivity {
         bluetooth.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-                switch (data[0]) {
-                    case 0x31: reply1(null);
-                    case 0x32: reply2(null);
-                    case 0x33: reply3(null);
+                switch (message) {
+                    case "1": reply1(null);
+                    case "2": reply2(null);
+                    case "3": reply3(null);
                     break;
                 }
             }
         });
-
-        // Send initial time data
-        if (isConnected) {
-            // Send byte array {0x11, Hour, Minute}
-            byte[] data = {0x11, (byte) calendar.get(Calendar.HOUR_OF_DAY), (byte) calendar.get(Calendar.MINUTE)};
-            bluetooth.send(data, false);
-        }
 
     }
 
