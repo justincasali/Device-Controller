@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import java.util.Calendar;
-import java.util.zip.CheckedOutputStream;
 
 import app.akexorcist.bluetotohspp.library.*;
 
@@ -33,11 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
     int lastIndex;
     SmsMessage[] msgs = null;
-    String contact = null;
 
     Calendar calendar;
 
-    private BluetoothSPP bluetooth;
+    public BluetoothSPP bluetooth;
 
     private String phoneNumber = null;
     private SmsManager smsManager;
@@ -156,20 +154,18 @@ public class MainActivity extends AppCompatActivity {
         bluetooth = new BluetoothSPP(getApplicationContext());
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-            if (resultCode == Activity.RESULT_OK) {
-                bluetooth.setupService();
-                bluetooth.startService(BluetoothState.DEVICE_OTHER);
-                bluetooth.connect(data);
-            }
-        }
-    }
-
     public void connect(View view) {
-        if (!bluetooth.isBluetoothEnabled() || !bluetooth.isBluetoothAvailable()) return;
-        Intent intent = new Intent(getApplicationContext(), DeviceList.class);
-        startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
+
+        bluetooth = new BluetoothSPP(getApplicationContext());
+
+        if (bluetooth.isBluetoothEnabled()) {
+            bluetooth.setupService();
+            bluetooth.startService(BluetoothState.DEVICE_OTHER);
+
+            Intent intent = new Intent(getApplicationContext(), DeviceList.class);
+            startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
+        }
+        else textStatus.setText("No Bluetooth");
 
         bluetooth.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             @Override
@@ -224,17 +220,31 @@ public class MainActivity extends AppCompatActivity {
 
         // Reading data
         bluetooth.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            @Override
             public void onDataReceived(byte[] data, String message) {
-                switch (message) {
-                    case "1": reply1(null);
-                    case "2": reply2(null);
-                    case "3": reply3(null);
-                    break;
+                // Reply messages based of data received
+                switch (data[0]) {
+                    case 0x31: reply1(null); break;
+                    case 0x32: reply2(null); break;
+                    case 0x33: reply3(null); break;
                 }
+
             }
         });
 
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
+            if (resultCode == Activity.RESULT_OK) {
+                bluetooth.connect(data);
+            }
+        }
+        else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
+                bluetooth.setupService();
+                bluetooth.startService(BluetoothState.DEVICE_OTHER);
+            }
+        }
     }
 
     public void reply1(View view) {
