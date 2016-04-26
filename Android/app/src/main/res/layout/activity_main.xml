@@ -9,8 +9,103 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ecen.devicecontroller.MainActivity">
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect"
+        android:id="@+id/buttonConnect"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/editText1"
+        android:onClick="connect" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Status"
+        android:id="@+id/textStatus"
+        android:layout_below="@+id/buttonConnect"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/buttonConnect" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Message"
+        android:id="@+id/textMessage"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/buttonConnect"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/buttonConnect" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Address"
+        android:id="@+id/textAddress"
+        android:layout_below="@+id/textMessage"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText1"
+        android:layout_above="@+id/editText2"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/editText2"
+        android:text="Yeah" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText2"
+        android:layout_above="@+id/editText3"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/editText3"
+        android:text="No" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText3"
+        android:layout_above="@+id/buttonReply1"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/buttonReply1"
+        android:text="Can&apos;t talk, in the shower" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply One"
+        android:id="@+id/buttonReply1"
+        android:onClick="reply1"
+        android:layout_above="@+id/buttonReply2"
+        android:layout_alignParentStart="true"
+        android:singleLine="true"
+        android:layout_alignEnd="@+id/buttonReply2" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply Two"
+        android:id="@+id/buttonReply2"
+        android:layout_above="@+id/buttonReply3"
+        android:layout_alignParentStart="true"
+        android:onClick="reply2"
+        android:layout_alignEnd="@+id/buttonReply3" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply Three"
+        android:id="@+id/buttonReply3"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="reply3" />
+
 </RelativeLayout>
