@@ -20,6 +20,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import java.util.Calendar;
 
 import app.akexorcist.bluetotohspp.library.*;
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     int lastIndex;
     SmsMessage[] msgs = null;
     String contact = null;
+
+    Calendar calendar;
 
     private BluetoothSPP bluetooth;
 
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 lastIndex = msgs.length - 1;
 
                 // First message in array
-                textMessage.setText(msgs[lastIndex].getMessageBody());
+                textMessage.setText(getContactName(msgs[lastIndex].getMessageBody()));
                 textAddress.setText(msgs[lastIndex].getOriginatingAddress());
                 phoneNumber = msgs[lastIndex].getOriginatingAddress();
 
@@ -103,19 +106,17 @@ public class MainActivity extends AppCompatActivity {
 
     private PhoneStateListener listener = new PhoneStateListener() {
         @Override
-        public void onCallStateChanged(int state, String incomingNumber) {
+        public void onCallStateChanged (int state, final String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                contact = getContactName(incomingNumber);
+                textAddress.setText(getContactName(incomingNumber));
                 textMessage.setText("Incoming Call");
-                textAddress.setText(contact);
-
                 if (isConnected) {
-                    byte[] data = {0x70};
+                    byte[] data = {0x63};
                     bluetooth.send(data, false);
                     new CountDownTimer(500, 500) {
                         @Override
                         public void onFinish() {
-                            bluetooth.send(contact, false);
+                            bluetooth.send(getContactName(incomingNumber), false);
                         }
 
                         @Override
@@ -124,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }.start();
                 }
-
             }
         }
     };
@@ -151,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Bluetooth
         bluetooth = new BluetoothSPP(getApplicationContext());
+
+        // Calender
+        calendar = Calendar.getInstance();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -192,15 +195,20 @@ public class MainActivity extends AppCompatActivity {
         bluetooth.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-                //
+                switch (data[0]) {
+                    case 0x31: reply1(null);
+                    case 0x32: reply2(null);
+                    case 0x33: reply3(null);
+                    break;
+                }
             }
         });
 
         // Send initial time data
         if (isConnected) {
-            // Send special character and time info, device control one.
-            //byte[] data = {0x11}
-            //bluetooth.send();
+            // Send byte array {0x11, Hour, Minute}
+            byte[] data = {0x11, (byte) calendar.get(Calendar.HOUR_OF_DAY), (byte) calendar.get(Calendar.MINUTE)};
+            bluetooth.send(data, false);
         }
 
     }
@@ -218,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Phone number to name converter
+
     public String getContactName(final String phoneNumber)
     {
         Uri uri;
